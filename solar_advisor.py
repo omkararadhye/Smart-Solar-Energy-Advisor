@@ -661,6 +661,52 @@ def readings(
     }
 
 
+@app.get("/api/compare-energy", tags=["Energy"])
+def compare_energy(
+    units:     float = Query(..., gt=0, description="kWh units to compare"),
+    system_id: str   = Query("default"),
+    db: Session = Depends(get_db),
+):
+    """Compare grid vs solar cost for a given number of kWh units."""
+    s = SettingsRepo.get(db, system_id)
+    grid_cost  = round(units * s.grid_price_per_kwh,  2)
+    solar_cost = round(units * (s.grid_price_per_kwh * 0.18), 2)  # ~18% of grid = solar O&M
+    savings    = round(grid_cost - solar_cost, 2)
+    co2_saved  = round(units * s.co2_factor, 4)
+    return {
+        "units_kwh":      units,
+        "currency":       "INR",
+        "grid_cost":      grid_cost,
+        "solar_cost":     solar_cost,
+        "savings":        savings,
+        "co2_saved_kg":   co2_saved,
+        "recommendation": "Solar recommended ☀️" if grid_cost > solar_cost else "Grid is cheaper",
+    }
+
+
+@app.get("/api/compare-energy-range", tags=["Energy"])
+def compare_energy_range(
+    max_units: int = Query(50,  ge=1,  le=1000),
+    step:      int = Query(5,   ge=1,  le=100),
+    system_id: str = Query("default"),
+    db: Session = Depends(get_db),
+):
+    """Return a cost comparison table for a range of kWh units (for charts)."""
+    s    = SettingsRepo.get(db, system_id)
+    data = []
+    for u in range(0, max_units + 1, step):
+        gc = round(u * s.grid_price_per_kwh, 2)
+        sc = round(u * s.grid_price_per_kwh * 0.18, 2)
+        data.append({
+            "units":       u,
+            "grid_cost":   gc,
+            "solar_cost":  sc,
+            "savings":     round(gc - sc, 2),
+            "co2_saved_kg": round(u * s.co2_factor, 4),
+        })
+    return {"currency": "INR", "range": {"max_units": max_units, "step": step}, "data": data}
+
+
 # ──────────────────────────────────────────────────────────────
 # 7.  BUILT-IN DASHBOARD UI  (served at  http://localhost:8000)
 # ──────────────────────────────────────────────────────────────
