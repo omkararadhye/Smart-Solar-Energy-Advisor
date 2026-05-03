@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Zyphera Grid — Solar Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   ZYPHERA GRID  ·  Design System
+   Aesthetic: Refined Dark SaaS · Warm Amber · Clean Precision
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  /* Core palette */
+  --bg:        #0d1117;
+  --s1:        #111827;
+  --s2:        #161f30;
+  --s3:        #1c2840;
+  --border:    rgba(255,255,255,.06);
+  --border-h:  rgba(255,255,255,.1);
+
+  /* Brand amber */
+  --a1:#f59e0b; --a2:#fbbf24; --a3:#fde68a;
+  --a-dim:rgba(245,158,11,.1); --a-glow:rgba(245,158,11,.22);
+
+  /* Eco green */
+  --g1:#10b981; --g2:#34d399;
+  --g-dim:rgba(16,185,129,.1); --g-glow:rgba(16,185,129,.18);
+
+  /* Grid blue */
+  --b1:#3b82f6; --b2:#60a5fa;
+  --b-dim:rgba(59,130,246,.1);
+
+  /* Load violet */
+  --v1:#8b5cf6; --v2:#a78bfa;
+  --v-dim:rgba(139,92,246,.1);
+
+  /* Danger */
+  --r1:#ef4444; --r2:#fca5a5; --r-dim:rgba(239,68,68,.1);
+
+  /* Text */
+  --t1:#f1f5f9; --t2:#94a3b8; --t3:#475569; --t4:#1e293b;
+
+  /* Fonts */
+  --f-head:'Syne',sans-serif;
+  --f-body:'DM Sans',sans-serif;
+  --f-mono:'DM Mono',monospace;
+
+  /* Tokens */
+  --rad:12px; --rad-s:8px; --rad-l:18px;
+  --shadow:0 4px 20px rgba(0,0,0,.4);
+  --shadow-l:0 8px 40px rgba(0,0,0,.5);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;font-size:14px}
+body{
+  background:var(--bg); color:var(--t1);
+  font-family:var(--f-body); line-height:1.6;
+  min-height:100vh; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Animated background mesh */
+body::before{
+  content:''; position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 55% 38% at 18% 8%, rgba(245,158,11,.065) 0%, transparent 52%),
+    radial-gradient(ellipse 42% 32% at 82% 88%, rgba(16,185,129,.048) 0%, transparent 52%),
+    radial-gradient(ellipse 30% 25% at 65% 42%, rgba(59,130,246,.032) 0%, transparent 52%);
+  animation:meshPulse 10s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+@keyframes meshPulse{
+  0%{opacity:.7}
+  50%{opacity:1; transform:scale(1.02)}
+  100%{opacity:.8}
+}
+
+/* Subtle grid lines */
+body::after{
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+
+/* Canvas for particles */
+#zg-canvas{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT SHELL
+   ═══════════════════════════════════════════════════════════ */
+.shell{display:flex;min-height:100vh;position:relative;z-index:2}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:232px; flex-shrink:0;
+  background:var(--s1); border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  position:fixed; top:0; left:0; bottom:0; z-index:60;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+
+.sb-brand{
+  padding:1.4rem 1.2rem 1rem;
+  border-bottom:1px solid var(--border);
+}
+.sb-logo{display:flex;align-items:center;gap:.65rem}
+.sb-icon{
+  width:34px; height:34px;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem; flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(245,158,11,.3), 0 4px 16px var(--a-glow);
+  animation:iconGlow 4s ease-in-out infinite;
+}
+@keyframes iconGlow{
+  0%,100%{box-shadow:0 0 0 1px rgba(245,158,11,.3),0 4px 16px var(--a-glow)}
+  50%{box-shadow:0 0 0 1px rgba(245,158,11,.5),0 4px 24px rgba(245,158,11,.35)}
+}
+.sb-name{font-family:var(--f-head);font-size:.95rem;font-weight:800;letter-spacing:-.01em;color:var(--t1)}
+.sb-tagline{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:.1rem;font-family:var(--f-mono)}
+
+.sb-nav{flex:1;padding:.6rem .7rem;display:flex;flex-direction:column;gap:.1rem;overflow-y:auto}
+.sb-section{
+  font-size:.58rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--t3);padding:.65rem .5rem .2rem;font-family:var(--f-mono);
+}
+.sb-item{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.5rem .7rem; border-radius:var(--rad-s);
+  font-size:.82rem;font-weight:500;color:var(--t2);
+  cursor:pointer;transition:all .18s;border:1px solid transparent;
+  position:relative;
+}
+.sb-item:hover{background:var(--s2);color:var(--t1);border-color:var(--border)}
+.sb-item.active{
+  background:var(--a-dim);color:var(--a2);border-color:rgba(245,158,11,.18);
+}
+.sb-item.active::before{
+  content:'';position:absolute;left:0;top:22%;bottom:22%;
+  width:2px;border-radius:1px;background:var(--a1);
+  box-shadow:0 0 8px var(--a1);
+}
+.sb-item .si{font-size:.82rem;width:16px;text-align:center;flex-shrink:0}
+.sb-badge{
+  margin-left:auto;font-size:.58rem;font-weight:600;
+  background:var(--a-dim);color:var(--a2);
+  border:1px solid rgba(245,158,11,.2);
+  padding:.08rem .4rem;border-radius:10px;font-family:var(--f-mono);
+}
+
+.sb-footer{padding:.7rem;border-top:1px solid var(--border)}
+.sb-user{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.55rem .7rem;border-radius:var(--rad-s);cursor:pointer;
+  transition:background .18s;
+}
+.sb-user:hover{background:var(--s2)}
+.sb-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--v1),var(--b1));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;color:#fff;flex-shrink:0;
+}
+.sb-uname{font-size:.78rem;font-weight:600;color:var(--t1)}
+.sb-urole{font-size:.62rem;color:var(--t3)}
+
+/* ── MAIN ── */
+.main{margin-left:232px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(13,17,23,.88);backdrop-filter:blur(24px) saturate(160%);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  animation:slideDown .45s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:none;opacity:1}}
+
+.tb-left{display:flex;align-items:center;gap:.75rem}
+.tb-title{font-family:var(--f-head);font-size:1.05rem;font-weight:800;letter-spacing:-.02em;color:var(--t1)}
+.tb-crumb{font-size:.7rem;color:var(--t3);font-family:var(--f-mono)}
+
+.tb-right{display:flex;align-items:center;gap:.6rem}
+
+.tb-weather{
+  display:flex;align-items:center;gap:.4rem;
+  background:var(--s2);border:1px solid var(--border-h);border-radius:var(--rad-s);
+  padding:.3rem .7rem;
+}
+.tb-weather select{
+  background:transparent;border:none;outline:none;
+  color:var(--t2);font-size:.75rem;font-family:var(--f-body);cursor:pointer;
+}
+.tb-weather select option{background:var(--s2)}
+
+.tb-hour{
+  display:flex;align-items:center;gap:.35rem;
+  background:var(--s2);border:1px solid var(--border-h);border-radius:var(--rad-s);
+  padding:.3rem .7rem;font-size:.72rem;color:var(--t3);font-family:var(--f-mono);
+}
+.tb-hour input{
+  width:38px;background:transparent;border:none;outline:none;
+  color:var(--t1);font-size:.75rem;font-family:var(--f-mono);text-align:center;
+}
+.tb-hour input::-webkit-inner-spin-button{display:none}
+
+.tb-conn{
+  display:flex;align-items:center;gap:.4rem;
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--rad-s);
+  padding:.3rem .75rem;font-size:.7rem;font-family:var(--f-mono);
+  transition:border-color .3s;
+}
+.tb-conn.ok{border-color:rgba(16,185,129,.3);color:var(--g2)}
+.tb-conn.err{border-color:rgba(239,68,68,.3);color:var(--r1)}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.tb-conn.ok .tb-dot{animation:connBlink 2s ease-in-out infinite;box-shadow:0 0 6px currentColor}
+@keyframes connBlink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+
+.btn-refresh{
+  display:flex;align-items:center;gap:.4rem;
+  background:var(--a-dim);border:1px solid rgba(245,158,11,.25);border-radius:var(--rad-s);
+  padding:.38rem .85rem;font-size:.75rem;font-weight:600;font-family:var(--f-body);
+  color:var(--a2);cursor:pointer;transition:all .18s;
+}
+.btn-refresh:hover{background:rgba(245,158,11,.18);box-shadow:0 0 16px rgba(245,158,11,.15);transform:translateY(-1px)}
+.btn-refresh:active{transform:none}
+.btn-refresh:hover .ri{animation:spinR .5s linear}
+@keyframes spinR{to{transform:rotate(360deg)}}
+
+.tb-time{
+  font-family:var(--f-mono);font-size:.85rem;font-weight:500;
+  color:var(--t2);letter-spacing:.04em;
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--rad-s);
+  padding:.3rem .75rem;min-width:80px;text-align:center;
+}
+
+/* ── CONTENT ── */
+.content{padding:1.75rem 2rem;flex:1}
+
+/* Sections */
+.sec{display:none;animation:secIn .35s cubic-bezier(.4,0,.2,1)}
+.sec.active{display:block}
+@keyframes secIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════════════════════════════
+   ERROR BANNER
+   ═══════════════════════════════════════════════════════════ */
+.err-banner{
+  display:none;align-items:center;gap:.75rem;
+  background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18);
+  border-radius:var(--rad);padding:.7rem 1rem;margin-bottom:1.2rem;
+  font-size:.8rem;color:var(--r1);
+  animation:secIn .3s ease;
+}
+.err-banner.show{display:flex}
+.err-banner code{
+  font-family:var(--f-mono);font-size:.72rem;
+  background:rgba(239,68,68,.1);padding:.1rem .4rem;border-radius:4px;
+}
+.err-retry{
+  margin-left:auto;background:none;border:1px solid rgba(239,68,68,.3);
+  color:var(--r1);border-radius:6px;padding:.2rem .6rem;
+  font-size:.7rem;cursor:pointer;font-family:var(--f-body);transition:.15s;
+}
+.err-retry:hover{background:rgba(239,68,68,.08)}
+
+/* ═══════════════════════════════════════════════════════════
+   GRID LAYOUTS
+   ═══════════════════════════════════════════════════════════ */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.1rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.1rem}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.1rem}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.1rem}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:1rem;margin-bottom:1.1rem}
+.s2{grid-column:span 2}.s3{grid-column:span 3}
+
+/* ═══════════════════════════════════════════════════════════
+   STAGGER ANIMATION
+   ═══════════════════════════════════════════════════════════ */
+.stagger>*{
+  opacity:0;transform:translateY(18px) scale(.99);
+  animation:cardIn .5s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes cardIn{to{opacity:1;transform:none}}
+.stagger>*:nth-child(1){animation-delay:.04s} .stagger>*:nth-child(2){animation-delay:.1s}
+.stagger>*:nth-child(3){animation-delay:.16s} .stagger>*:nth-child(4){animation-delay:.22s}
+.stagger>*:nth-child(5){animation-delay:.28s} .stagger>*:nth-child(6){animation-delay:.34s}
+.stagger>*:nth-child(7){animation-delay:.4s}  .stagger>*:nth-child(8){animation-delay:.46s}
+.stagger>*:nth-child(9){animation-delay:.52s}
+
+/* ═══════════════════════════════════════════════════════════
+   CARD BASE
+   ═══════════════════════════════════════════════════════════ */
+.card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rad);padding:1.25rem 1.4rem;
+  position:relative;overflow:hidden;transition:border-color .25s,box-shadow .25s;
+}
+.card:hover{border-color:var(--border-h)}
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(255,255,255,.022),transparent 55%);
+  pointer-events:none;
+}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem}
+.ct{
+  font-family:var(--f-mono);font-size:.62rem;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--t3);
+  display:flex;align-items:center;gap:.4rem;
+}
+.ct-dot{width:4px;height:4px;border-radius:50%}
+
+/* ═══════════════════════════════════════════════════════════
+   KPI CARDS
+   ═══════════════════════════════════════════════════════════ */
+.kpi{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rad);padding:1.3rem 1.4rem;
+  position:relative;overflow:hidden;
+  cursor:default;transition:all .28s cubic-bezier(.4,0,.2,1);
+}
+.kpi:hover{transform:translateY(-3px)}
+.kpi::after{
+  content:'';position:absolute;top:0;left:1rem;right:1rem;height:1px;
+}
+.kpi-a::after{background:linear-gradient(90deg,transparent,var(--a1),transparent)}
+.kpi-g::after{background:linear-gradient(90deg,transparent,var(--g1),transparent)}
+.kpi-b::after{background:linear-gradient(90deg,transparent,var(--b1),transparent)}
+.kpi-v::after{background:linear-gradient(90deg,transparent,var(--v1),transparent)}
+
+/* Hover glow per type */
+.kpi-a:hover{box-shadow:0 12px 36px rgba(245,158,11,.1),inset 0 0 30px rgba(245,158,11,.02)}
+.kpi-g:hover{box-shadow:0 12px 36px rgba(16,185,129,.1),inset 0 0 30px rgba(16,185,129,.02)}
+.kpi-b:hover{box-shadow:0 12px 36px rgba(59,130,246,.1),inset 0 0 30px rgba(59,130,246,.02)}
+.kpi-v:hover{box-shadow:0 12px 36px rgba(139,92,246,.1),inset 0 0 30px rgba(139,92,246,.02)}
+
+/* Glow blob bg */
+.kpi-blob{
+  position:absolute;top:-20px;right:-20px;width:90px;height:90px;
+  border-radius:50%;opacity:.06;filter:blur(28px);pointer-events:none;
+}
+.kpi-a .kpi-blob{background:var(--a1)} .kpi-g .kpi-blob{background:var(--g1)}
+.kpi-b .kpi-blob{background:var(--b1)} .kpi-v .kpi-blob{background:var(--v1)}
+
+.kpi-lbl{
+  display:flex;align-items:center;gap:.4rem;
+  font-family:var(--f-mono);font-size:.62rem;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--t3);
+  margin-bottom:.7rem;
+}
+.kpi-ico{
+  width:22px;height:22px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:.72rem;
+}
+.kpi-a .kpi-ico{background:var(--a-dim);color:var(--a2)}
+.kpi-g .kpi-ico{background:var(--g-dim);color:var(--g2)}
+.kpi-b .kpi-ico{background:var(--b-dim);color:var(--b2)}
+.kpi-v .kpi-ico{background:var(--v-dim);color:var(--v2)}
+
+.kpi-val{
+  font-family:var(--f-head);font-size:2.4rem;font-weight:800;
+  letter-spacing:-.03em;line-height:1;
+}
+.kpi-a .kpi-val{color:var(--a2)} .kpi-g .kpi-val{color:var(--g2)}
+.kpi-b .kpi-val{color:var(--b2)} .kpi-v .kpi-val{color:var(--v2)}
+
+.kpi-unit{font-family:var(--f-mono);font-size:.68rem;color:var(--t3);margin-top:.35rem}
+.kpi-sub{
+  display:flex;align-items:center;gap:.35rem;
+  margin-top:.5rem;font-size:.72rem;color:var(--t2);
+}
+
+/* Number count-up flash */
+.kpi-val.updating{animation:valPop .2s cubic-bezier(.34,1.56,.64,1)}
+@keyframes valPop{0%{opacity:.4;transform:scale(.96)}100%{opacity:1;transform:scale(1)}}
+
+/* SOC bar */
+.soc-rail{
+  height:3px;background:var(--s3);border-radius:2px;overflow:hidden;
+  margin-top:.6rem;position:relative;
+}
+.soc-rail::after{
+  content:'';position:absolute;top:0;left:-200%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+  animation:shimmer 2.2s linear infinite;
+}
+@keyframes shimmer{to{left:200%}}
+.soc-fill{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+
+/* ═══════════════════════════════════════════════════════════
+   STATUS PILLS
+   ═══════════════════════════════════════════════════════════ */
+.pill{
+  display:inline-flex;align-items:center;
+  font-family:var(--f-mono);font-size:.58rem;font-weight:500;
+  letter-spacing:.05em;text-transform:uppercase;
+  padding:.15rem .5rem;border-radius:20px;border:1px solid;
+  animation:badgePop .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes badgePop{0%{transform:scale(0)}80%{transform:scale(1.08)}100%{transform:scale(1)}}
+.pill-a{background:var(--a-dim);color:var(--a2);border-color:rgba(245,158,11,.2)}
+.pill-g{background:var(--g-dim);color:var(--g2);border-color:rgba(16,185,129,.2)}
+.pill-b{background:var(--b-dim);color:var(--b2);border-color:rgba(59,130,246,.2)}
+.pill-v{background:var(--v-dim);color:var(--v2);border-color:rgba(139,92,246,.2)}
+.pill-r{background:var(--r-dim);color:var(--r2);border-color:rgba(239,68,68,.2)}
+
+/* ═══════════════════════════════════════════════════════════
+   GAUGE  (SVG arc)
+   ═══════════════════════════════════════════════════════════ */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:.8rem;padding:.5rem 0}
+.gauge-ring{position:relative;width:148px;height:148px}
+.gauge-ring svg{transform:rotate(-90deg)}
+.g-track{fill:none;stroke:var(--s3);stroke-width:10}
+.g-fill{
+  fill:none;stroke-width:10;stroke-linecap:round;
+  transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1);
+  filter:drop-shadow(0 0 5px rgba(16,185,129,.4));
+}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-n{font-family:var(--f-head);font-size:2rem;font-weight:800;line-height:1;color:var(--g2)}
+.gauge-l{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:.18rem}
+/* Double halo */
+.gauge-ring::before,.gauge-ring::after{
+  content:'';position:absolute;border-radius:50%;
+  border:1px solid rgba(16,185,129,.08);
+}
+.gauge-ring::before{inset:-10px}
+.gauge-ring::after{
+  inset:-18px;border-color:rgba(16,185,129,.04);
+  animation:halo 4s ease-in-out infinite;
+}
+@keyframes halo{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.5}}
+
+.ff-row{display:flex;align-items:center;gap:.6rem;width:100%;font-family:var(--f-mono);font-size:.65rem}
+.ff-lbl{color:var(--t3);white-space:nowrap}
+.ff-track{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.ff-fill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2));border-radius:2px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.ff-val{color:var(--a2);min-width:36px;text-align:right}
+
+/* ═══════════════════════════════════════════════════════════
+   AREA CHART  (canvas)
+   ═══════════════════════════════════════════════════════════ */
+.chart-outer{position:relative;height:200px;padding-left:38px;margin-top:.5rem}
+#chart-cv{width:100%;height:100%}
+.chart-ylbl{
+  position:absolute;left:0;top:0;bottom:20px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  font-family:var(--f-mono);font-size:.58rem;color:var(--t3);padding-right:.3rem;
+  pointer-events:none;
+}
+.chart-tt{
+  position:absolute;
+  background:rgba(22,31,48,.95);border:1px solid var(--border-h);
+  border-radius:var(--rad-s);padding:.6rem .85rem;
+  font-family:var(--f-mono);font-size:.7rem;
+  pointer-events:none;opacity:0;transition:opacity .15s;
+  box-shadow:var(--shadow);z-index:10;min-width:130px;
+  backdrop-filter:blur(12px);
+}
+.chart-tt.vis{opacity:1}
+.tt-hr{font-size:.6rem;color:var(--t3);margin-bottom:.3rem}
+.tt-row{display:flex;justify-content:space-between;gap:.8rem;margin-top:.18rem}
+.tt-k{color:var(--t2)}
+.chart-leg{display:flex;gap:1rem;margin-top:.6rem;font-family:var(--f-mono);font-size:.65rem;color:var(--t2)}
+.cl-item{display:flex;align-items:center;gap:.35rem}
+.cl-dot{width:6px;height:6px;border-radius:2px}
+
+/* ═══════════════════════════════════════════════════════════
+   BAR CHART  (forecast)
+   ═══════════════════════════════════════════════════════════ */
+.bchart{
+  height:155px;display:flex;align-items:flex-end;gap:3px;
+  padding-bottom:22px;position:relative;overflow:hidden;
+}
+.bchart::after{
+  content:'';position:absolute;bottom:22px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border-h),transparent);
+}
+.bchart::before{
+  content:'';position:absolute;top:0;bottom:22px;left:0;right:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 34px,rgba(22,32,51,.45) 35px);
+  pointer-events:none;
+}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;position:relative}
+.bc.cur::before{content:'';position:absolute;top:0;bottom:22px;left:50%;width:1px;background:rgba(245,158,11,.25)}
+.bc.cur::after{
+  content:'NOW';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  font-family:var(--f-mono);font-size:.48rem;color:var(--a2);letter-spacing:.08em;
+  animation:nowPulse 2s ease-in-out infinite;
+}
+@keyframes nowPulse{0%,100%{opacity:1}50%{opacity:.35}}
+.bg2{width:100%;display:flex;gap:1px;align-items:flex-end;flex:1}
+.bar{
+  flex:1;border-radius:3px 3px 0 0;min-height:2px;
+  transition:height .7s cubic-bezier(.4,0,.2,1);cursor:pointer;
+}
+.bar:hover{filter:brightness(1.35)}
+.bar.sb{background:linear-gradient(180deg,var(--a2) 0%,rgba(245,158,11,.2) 100%)}
+.bar.lb{background:linear-gradient(180deg,var(--b2) 0%,rgba(59,130,246,.18) 100%)}
+.blbl{font-family:var(--f-mono);font-size:.5rem;color:var(--t3);position:absolute;bottom:-18px}
+
+/* ═══════════════════════════════════════════════════════════
+   FINANCIAL CARDS
+   ═══════════════════════════════════════════════════════════ */
+.fin-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.fin-card{
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--rad);
+  padding:.95rem 1.05rem;position:relative;overflow:hidden;transition:all .22s;
+}
+.fin-card:hover{transform:translateY(-2px);border-color:var(--border-h)}
+.fin-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;border-radius:1px;
+}
+.fc-cost::before{background:linear-gradient(180deg,var(--r1),transparent)}
+.fc-save::before{background:linear-gradient(180deg,var(--g1),transparent)}
+.fc-co2::before{background:linear-gradient(180deg,var(--a1),transparent)}
+.fin-lbl{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:.35rem}
+.fin-val{font-family:var(--f-head);font-size:1.6rem;font-weight:800;letter-spacing:-.02em;line-height:1}
+.fc-cost .fin-val{color:var(--r2)}
+.fc-save .fin-val{color:var(--g2)}
+.fc-co2  .fin-val{color:var(--a2)}
+.fin-sub{font-family:var(--f-mono);font-size:.6rem;color:var(--t3);margin-top:.25rem}
+
+/* ═══════════════════════════════════════════════════════════
+   TARIFF TIMELINE
+   ═══════════════════════════════════════════════════════════ */
+.ttl-bar{
+  display:flex;height:32px;border-radius:9px;overflow:hidden;gap:2px;
+  margin-bottom:.7rem;
+}
+.ts{
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:.57rem;font-weight:500;
+  letter-spacing:.05em;text-transform:uppercase;cursor:default;
+  position:relative;overflow:hidden;transition:filter .25s;
+}
+.ts::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.07),transparent)}
+.ts.now{animation:tariffGlow 2.5s ease-in-out infinite}
+@keyframes tariffGlow{0%,100%{filter:brightness(1.5)}50%{filter:brightness(2.2)}}
+.ts-pk{background:rgba(239,68,68,.22);color:var(--r2);border:1px solid rgba(239,68,68,.18)}
+.ts-sh{background:rgba(245,158,11,.18);color:var(--a2);border:1px solid rgba(245,158,11,.15)}
+.ts-op{background:rgba(16,185,129,.14);color:var(--g2);border:1px solid rgba(16,185,129,.12)}
+.ttl-legend{display:flex;gap:1.2rem;flex-wrap:wrap;font-family:var(--f-mono);font-size:.62rem;color:var(--t2)}
+.tl-it{display:flex;align-items:center;gap:.35rem}
+.tl-dot{width:6px;height:6px;border-radius:2px}
+
+/* ═══════════════════════════════════════════════════════════
+   INSIGHT
+   ═══════════════════════════════════════════════════════════ */
+.insight{background:var(--s1);border:1px solid var(--border);border-radius:var(--rad);padding:1.25rem 1.4rem;position:relative;overflow:hidden}
+.ins-flag{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px}
+.ins-flag-a{background:linear-gradient(180deg,var(--a1),rgba(245,158,11,.15))}
+.ins-flag-g{background:linear-gradient(180deg,var(--g1),rgba(16,185,129,.15))}
+.ins-flag-r{background:linear-gradient(180deg,var(--r1),rgba(239,68,68,.15))}
+.ins-body{padding-left:.75rem}
+.ins-chip{
+  display:inline-flex;align-items:center;gap:.3rem;
+  font-family:var(--f-mono);font-size:.6rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+  padding:.17rem .55rem;border-radius:20px;border:1px solid;margin-bottom:.6rem;
+}
+.ins-msg{
+  font-family:var(--f-head);font-size:1.35rem;font-weight:800;
+  letter-spacing:-.01em;line-height:1.25;color:var(--t1);margin-bottom:.7rem;
+}
+.ins-tips{list-style:none}
+.ins-tips li{
+  font-size:.8rem;color:var(--t2);padding:.3rem 0 .3rem 1.1rem;
+  position:relative;border-bottom:1px solid var(--border);
+  opacity:0;animation:cardIn .4s ease forwards;
+}
+.ins-tips li:last-child{border-bottom:none}
+.ins-tips li::before{content:'→';position:absolute;left:0;color:var(--a1);font-size:.72rem;top:.36rem}
+.ins-tips li:nth-child(1){animation-delay:.12s}
+.ins-tips li:nth-child(2){animation-delay:.24s}
+.ins-tips li:nth-child(3){animation-delay:.36s}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLES
+   ═══════════════════════════════════════════════════════════ */
+.tbl{width:100%;border-collapse:collapse;font-size:.78rem}
+.tbl th{
+  font-family:var(--f-mono);font-size:.59rem;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--t3);padding:.55rem .8rem;
+  border-bottom:1px solid var(--border);text-align:left;
+  position:sticky;top:0;background:var(--s1);z-index:5;
+}
+.tbl td{padding:.5rem .8rem;border-bottom:1px solid var(--border);color:var(--t2);transition:background .12s}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:rgba(255,255,255,.018)}
+.tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+.tbl tbody tr:nth-child(even):hover td{background:rgba(255,255,255,.022)}
+.tv-sol{color:var(--a2);font-weight:500}
+.tv-load{color:var(--b2);font-weight:500}
+.tv-imp{color:var(--r2);font-weight:500}
+.tv-exp{color:var(--g2);font-weight:500}
+.tv-eff{color:var(--b2)}
+
+/* ═══════════════════════════════════════════════════════════
+   FORMS / SETTINGS
+   ═══════════════════════════════════════════════════════════ */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem}
+.lgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin-bottom:.85rem}
+.field{display:flex;flex-direction:column;gap:.28rem}
+.field label{font-family:var(--f-mono);font-size:.59rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.field input,.field select{
+  background:var(--s2);border:1px solid var(--border-h);color:var(--t1);
+  padding:.5rem .85rem;border-radius:var(--rad-s);font-family:var(--f-body);
+  font-size:.82rem;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;
+}
+.field input:focus,.field select:focus{
+  border-color:var(--a1);box-shadow:0 0 0 3px rgba(245,158,11,.1);
+}
+.field input::placeholder{color:var(--t3)}
+.field-note{font-family:var(--f-mono);font-size:.58rem;color:var(--t3)}
+
+.btn{
+  font-family:var(--f-body);font-size:.78rem;font-weight:600;
+  border:1px solid;border-radius:var(--rad-s);
+  padding:.5rem 1.1rem;cursor:pointer;transition:all .18s;
+  display:inline-flex;align-items:center;gap:.4rem;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-pri{background:linear-gradient(135deg,var(--a1),#d97706);color:#170e00;border-color:transparent;box-shadow:0 2px 8px rgba(245,158,11,.25)}
+.btn-pri:hover{filter:brightness(1.07);box-shadow:0 4px 16px rgba(245,158,11,.35)}
+.btn-sec{background:var(--s2);color:var(--t2);border-color:var(--border-h)}
+.btn-sec:hover{background:var(--s3);color:var(--t1)}
+.btn-grn{background:var(--g-dim);color:var(--g2);border-color:rgba(16,185,129,.25)}
+.btn-grn:hover{background:rgba(16,185,129,.18);box-shadow:0 4px 12px rgba(16,185,129,.15)}
+.btn-blu{background:var(--b-dim);color:var(--b2);border-color:rgba(59,130,246,.25)}
+.btn-blu:hover{background:rgba(59,130,246,.18)}
+
+/* Battery slider */
+.slider-row{display:flex;align-items:center;gap:.85rem;margin-top:.75rem}
+.slider-row input[type=range]{flex:1;accent-color:var(--g1);cursor:pointer;height:3px}
+.slider-val{font-family:var(--f-head);font-size:.95rem;font-weight:800;color:var(--g2);min-width:65px;text-align:right}
+
+/* Tariff admin list */
+.t-list{display:flex;flex-direction:column;gap:.4rem;max-height:230px;overflow-y:auto}
+.t-row{
+  display:flex;align-items:center;gap:.85rem;
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--rad-s);
+  padding:.55rem .9rem;font-size:.78rem;
+  transition:all .18s;
+}
+.t-row:hover{border-color:var(--border-h);transform:translateX(3px)}
+.t-name{width:80px;font-weight:600;font-family:var(--f-mono);font-size:.72rem}
+.t-pk{color:var(--r2)} .t-sh{color:var(--a2)} .t-op{color:var(--g2)}
+.t-hrs{color:var(--t3);flex:1;font-family:var(--f-mono);font-size:.68rem}
+.t-mult{font-family:var(--f-head);font-size:.95rem;font-weight:800;color:var(--a2)}
+.t-del{
+  background:none;border:1px solid rgba(239,68,68,.22);color:var(--r1);
+  border-radius:5px;padding:.12rem .45rem;cursor:pointer;font-size:.65rem;font-family:var(--f-body);transition:.15s;
+}
+.t-del:hover{background:rgba(239,68,68,.08)}
+
+/* Compare bars */
+.cmp-bars{
+  display:flex;gap:5px;height:180px;align-items:flex-end;
+  padding-bottom:22px;overflow-x:auto;position:relative;
+}
+.cmp-bars::after{content:'';position:absolute;bottom:22px;left:0;right:0;height:1px;background:var(--border)}
+.cg2{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;min-width:30px}
+.cp2{display:flex;gap:2px;align-items:flex-end;height:156px}
+.cb2{width:13px;border-radius:3px 3px 0 0;min-height:2px;transition:height .6s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.cb2:hover{filter:brightness(1.4)}
+.cb2.gb{background:linear-gradient(180deg,var(--b2),rgba(59,130,246,.18))}
+.cb2.sb{background:linear-gradient(180deg,var(--a2),rgba(245,158,11,.18))}
+.cg-lbl{font-family:var(--f-mono);font-size:.5rem;color:var(--t3);position:relative;top:4px}
+
+/* Mini stat */
+.mini{background:var(--s2);border:1px solid var(--border);border-radius:var(--rad-s);padding:.65rem .85rem}
+.mini-l{font-family:var(--f-mono);font-size:.59rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.mini-v{font-family:var(--f-head);font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-top:.2rem}
+
+/* Loc status */
+.loc-status{font-family:var(--f-mono);font-size:.7rem;color:var(--g2);min-height:1.1em;margin-top:.4rem}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;
+  background:var(--s2);border:1px solid var(--border-h);border-radius:var(--rad);
+  padding:.72rem 1.1rem;font-family:var(--f-body);font-size:.78rem;
+  display:flex;align-items:center;gap:.5rem;
+  transform:translateY(70px) scale(.9);opacity:0;
+  transition:.32s cubic-bezier(.34,1.2,.64,1);pointer-events:none;
+  max-width:300px;box-shadow:var(--shadow-l);backdrop-filter:blur(16px);
+}
+.toast.on{transform:translateY(0) scale(1);opacity:1}
+.toast.s{border-left:2px solid var(--g1)}
+.toast.e{border-left:2px solid var(--r1)}
+.toast.i{border-left:2px solid var(--b1)}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+@media(max-width:1100px){
+  .sidebar{width:200px}.main{margin-left:200px}
+  .g4{grid-template-columns:repeat(2,1fr)}.sgrid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .sidebar{display:none}.main{margin-left:0}
+  .g4,.g3,.g2,.g21,.g12{grid-template-columns:1fr}
+  .fin-row,.sgrid,.lgrid{grid-template-columns:1fr 1fr}
+  .s2,.s3{grid-column:span 1}
+  .content{padding:1rem}
+}
+</style>
+</head>
+<body>
+<!-- ── CANVAS ── -->
+<canvas id="zg-canvas"></canvas>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<div class="shell">
+
+<!-- ═══════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <div class="sb-icon">⚡</div>
+      <div>
+        <div class="sb-name">Zyphera Grid</div>
+        <div class="sb-tagline">Solar Intelligence</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section">Platform</div>
+    <div class="sb-item active" onclick="showSec('dashboard',this)"><span class="si">📊</span>Dashboard</div>
+    <div class="sb-item" onclick="showSec('forecast',this)"><span class="si">🔮</span>Forecast</div>
+    <div class="sb-item" onclick="showSec('compare',this)"><span class="si">⚖️</span>Cost Compare</div>
+    <div class="sb-item" onclick="showSec('history',this)"><span class="si">📈</span>History<span class="sb-badge" id="hist-badge">—</span></div>
+
+    <div class="sb-section">Configuration</div>
+    <div class="sb-item" onclick="showSec('settings',this)"><span class="si">⚙️</span>Settings</div>
+    <div class="sb-item" onclick="showSec('tariffs',this)"><span class="si">💰</span>Tariffs</div>
+    <div class="sb-item" onclick="showSec('location',this)"><span class="si">📍</span>Location</div>
+    <div class="sb-item" onclick="showSec('battery',this)"><span class="si">🔋</span>Battery</div>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">ZG</div>
+      <div><div class="sb-uname">Site Admin</div><div class="sb-urole">Default System</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════ -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <div>
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <div class="tb-crumb" id="tb-crumb">Overview · Real-time</div>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-conn err" id="tb-conn">
+        <div class="tb-dot"></div>
+        <span id="tb-conn-txt">Connecting</span>
+      </div>
+      <div class="tb-weather">
+        ☁&nbsp;
+        <select id="cw" onchange="">
+          <option value="clear">Clear</option>
+          <option value="partly_cloudy">Partly Cloudy</option>
+          <option value="overcast">Overcast</option>
+          <option value="rainy">Rainy</option>
+          <option value="foggy">Foggy</option>
+          <option value="stormy">Stormy</option>
+        </select>
+      </div>
+      <div class="tb-hour">
+        🕐
+        <input type="number" id="ch" min="0" max="23" placeholder="auto" title="Simulate hour 0–23">
+      </div>
+      <button class="btn-refresh" onclick="loadDash()"><span class="ri">↺</span>Refresh</button>
+      <div class="tb-time" id="tb-time">--:--:--</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- Error banner -->
+    <div class="err-banner" id="err-banner">
+      ⚠ Cannot reach <code id="err-url">—</code> — start your backend and ensure CORS is enabled.
+      <button class="err-retry" onclick="loadDash()">Retry</button>
+    </div>
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="sec active" id="sec-dashboard">
+
+      <div class="g4 stagger">
+        <div class="kpi kpi-a">
+          <div class="kpi-blob"></div>
+          <div class="kpi-lbl"><div class="kpi-ico">☀</div>Solar Generation</div>
+          <div class="kpi-val" id="k-sol">—</div>
+          <div class="kpi-unit">Watts</div>
+          <div class="kpi-sub">
+            <span class="pill pill-a" id="k-sol-p" style="animation:none">—</span>
+            <span id="k-sol-kw" style="font-family:var(--f-mono);font-size:.68rem">— kW</span>
+          </div>
+        </div>
+        <div class="kpi kpi-b">
+          <div class="kpi-blob"></div>
+          <div class="kpi-lbl"><div class="kpi-ico">🏠</div>Home Load</div>
+          <div class="kpi-val" id="k-load">—</div>
+          <div class="kpi-unit">Watts</div>
+          <div class="kpi-sub">
+            <span class="pill pill-b" id="k-load-p" style="animation:none">—</span>
+            <span id="k-load-kw" style="font-family:var(--f-mono);font-size:.68rem">—</span>
+          </div>
+        </div>
+        <div class="kpi kpi-g">
+          <div class="kpi-blob"></div>
+          <div class="kpi-lbl"><div class="kpi-ico">⚡</div>Grid Status</div>
+          <div class="kpi-val" id="k-grid">—</div>
+          <div class="kpi-unit" id="k-grid-dir">W</div>
+          <div class="kpi-sub">
+            <span class="pill" id="k-tariff-p" style="animation:none">—</span>
+            <span id="k-tariff-price" style="font-family:var(--f-mono);font-size:.68rem">—</span>
+          </div>
+        </div>
+        <div class="kpi kpi-v">
+          <div class="kpi-blob"></div>
+          <div class="kpi-lbl"><div class="kpi-ico">🔋</div>Battery SOC</div>
+          <div class="kpi-val" id="k-soc">—</div>
+          <div class="soc-rail"><div class="soc-fill" id="soc-fill" style="width:0%"></div></div>
+          <div class="kpi-unit" id="k-soc-kwh">— kWh stored</div>
+        </div>
+      </div>
+
+      <div class="g3 stagger">
+        <!-- Area chart -->
+        <div class="card s2">
+          <div class="ch">
+            <div class="ct"><div class="ct-dot" style="background:var(--a1)"></div>24-Hour Energy Profile</div>
+            <div class="chart-leg">
+              <div class="cl-item"><div class="cl-dot" style="background:var(--a2)"></div>Solar W</div>
+              <div class="cl-item"><div class="cl-dot" style="background:var(--b2)"></div>Load W</div>
+            </div>
+          </div>
+          <div class="chart-outer">
+            <div class="chart-ylbl" id="chart-ylbl"></div>
+            <canvas id="chart-cv"></canvas>
+            <div class="chart-tt" id="chart-tt">
+              <div class="tt-hr" id="tt-hr">—</div>
+              <div class="tt-row"><span class="tt-k">Solar</span><span id="tt-sol" style="color:var(--a2);font-weight:600">—</span></div>
+              <div class="tt-row"><span class="tt-k">Load</span><span id="tt-load" style="color:var(--b2);font-weight:600">—</span></div>
+              <div class="tt-row"><span class="tt-k">Grid</span><span id="tt-grid" style="color:var(--g2);font-weight:600">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gauge -->
+        <div class="card" style="display:flex;flex-direction:column">
+          <div class="ch"><div class="ct"><div class="ct-dot" style="background:var(--g1)"></div>Solar Efficiency</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem">
+            <div class="gauge-wrap">
+              <div class="gauge-ring">
+                <svg viewBox="0 0 120 120" width="148" height="148">
+                  <circle class="g-track" cx="60" cy="60" r="50"/>
+                  <circle class="g-fill" id="g-arc" cx="60" cy="60" r="50"
+                    stroke="url(#gGrad)" stroke-dasharray="314" stroke-dashoffset="314"/>
+                  <defs>
+                    <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#10b981"/>
+                      <stop offset="100%" stop-color="#f59e0b"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="gauge-center">
+                  <div class="gauge-n" id="g-eff">—</div>
+                  <div class="gauge-l">Efficiency</div>
+                </div>
+              </div>
+            </div>
+            <div class="ff-row" style="padding:0 .5rem">
+              <span class="ff-lbl">Fill Factor</span>
+              <div class="ff-track"><div class="ff-fill" id="ff-bar" style="width:0%"></div></div>
+              <span class="ff-val" id="ff-val">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="g3 stagger">
+        <!-- Financials -->
+        <div class="card">
+          <div class="ch">
+            <div class="ct"><div class="ct-dot" style="background:var(--a1)"></div>Financial · This Hour</div>
+            <span style="font-family:var(--f-mono);font-size:.62rem;color:var(--t3)" id="fin-price">—</span>
+          </div>
+          <div class="fin-row">
+            <div class="fin-card fc-cost"><div class="fin-lbl">Grid Cost</div><div class="fin-val" id="fin-cost">₹ —</div><div class="fin-sub">import this hour</div></div>
+            <div class="fin-card fc-save"><div class="fin-lbl">Savings</div><div class="fin-val" id="fin-save">₹ —</div><div class="fin-sub">vs grid-only</div></div>
+            <div class="fin-card fc-co2"><div class="fin-lbl">CO₂ Saved</div><div class="fin-val" id="fin-co2">— kg</div><div class="fin-sub">solar offset</div></div>
+          </div>
+        </div>
+
+        <!-- Tariff timeline -->
+        <div class="card">
+          <div class="ch">
+            <div class="ct"><div class="ct-dot" style="background:var(--a1)"></div>Tariff Schedule · 24H</div>
+            <span class="pill pill-a" id="tariff-now" style="animation:none">—</span>
+          </div>
+          <div class="ttl-bar" id="ttl-bar"></div>
+          <div class="ttl-legend">
+            <div class="tl-it"><div class="tl-dot" style="background:var(--r2)"></div>Peak ×1.5</div>
+            <div class="tl-it"><div class="tl-dot" style="background:var(--a2)"></div>Shoulder ×1.0</div>
+            <div class="tl-it"><div class="tl-dot" style="background:var(--g2)"></div>Off-Peak</div>
+          </div>
+        </div>
+
+        <!-- Insight -->
+        <div class="insight">
+          <div class="ins-flag ins-flag-a" id="ins-flag"></div>
+          <div class="ins-body">
+            <div class="ins-chip pill-a" id="ins-chip" style="font-family:var(--f-mono);font-size:.6rem;padding:.17rem .55rem;border-radius:20px;border:1px solid;display:inline-flex;margin-bottom:.6rem">monitor</div>
+            <div class="ins-msg" id="ins-msg">Analyzing system…</div>
+            <ul class="ins-tips" id="ins-tips"></ul>
+          </div>
+        </div>
+      </div>
+    </div><!-- /dashboard -->
+
+    <!-- ═══ FORECAST ═══ -->
+    <div class="sec" id="sec-forecast">
+      <div class="g21 stagger">
+        <div class="card">
+          <div class="ch">
+            <div class="ct"><div class="ct-dot" style="background:var(--a1)"></div>24-Hour Forecast</div>
+            <div style="display:flex;align-items:center;gap:.6rem">
+              <div class="chart-leg">
+                <div class="cl-item"><div class="cl-dot" style="background:var(--a2)"></div>Solar</div>
+                <div class="cl-item"><div class="cl-dot" style="background:var(--b2)"></div>Load</div>
+              </div>
+              <select id="fc-weather" onchange="loadForecast()" style="background:var(--s2);border:1px solid var(--border-h);color:var(--t2);font-size:.7rem;padding:.25rem .5rem;border-radius:6px;font-family:var(--f-body);outline:none">
+                <option value="clear">☀ Clear</option><option value="partly_cloudy">⛅ Partly Cloudy</option>
+                <option value="overcast">☁ Overcast</option><option value="rainy">🌧 Rainy</option>
+                <option value="foggy">🌫 Foggy</option><option value="stormy">⛈ Stormy</option>
+              </select>
+            </div>
+          </div>
+          <div class="bchart" id="fc-chart"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ct-dot" style="background:var(--g1)"></div>Hourly Detail</div></div>
+          <div style="overflow-y:auto;max-height:220px">
+            <table class="tbl"><thead><tr><th>Hr</th><th>Solar W</th><th>Load W</th><th>Tariff</th></tr></thead><tbody id="fc-tbl"></tbody></table>
+          </div>
+        </div>
+      </div>
+      <div class="g4 stagger">
+        <div class="mini"><div class="mini-l">Peak Solar Hour</div><div class="mini-v" id="fc-pkhr" style="color:var(--a2)">—</div></div>
+        <div class="mini"><div class="mini-l">Peak Solar Output</div><div class="mini-v" id="fc-pkw" style="color:var(--a2)">— W</div></div>
+        <div class="mini"><div class="mini-l">Peak Load Hour</div><div class="mini-v" id="fc-lhr" style="color:var(--b2)">—</div></div>
+        <div class="mini"><div class="mini-l">Daily Solar Avg</div><div class="mini-v" id="fc-avg" style="color:var(--g2)">— W</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ COMPARE ═══ -->
+    <div class="sec" id="sec-compare">
+      <div style="display:flex;gap:.75rem;margin-bottom:1.1rem;flex-wrap:wrap;align-items:flex-end">
+        <div class="field" style="width:140px"><label>Max Units kWh</label><input type="number" id="cmx" value="50" min="5" max="1000"></div>
+        <div class="field" style="width:100px"><label>Step</label><input type="number" id="cst" value="5" min="1" max="100"></div>
+        <button class="btn btn-pri" onclick="loadCompare()" style="align-self:flex-end">Compare Range</button>
+        <div class="field" style="width:130px"><label>Single Units kWh</label><input type="number" id="su" value="10" min="0.1" step="0.5"></div>
+        <button class="btn btn-sec" onclick="loadSingle()" style="align-self:flex-end">Calculate</button>
+      </div>
+      <div class="g2 stagger">
+        <div class="card">
+          <div class="ch">
+            <div class="ct"><div class="ct-dot" style="background:var(--b1)"></div>Grid vs Solar Cost</div>
+            <div class="chart-leg">
+              <div class="cl-item"><div class="cl-dot" style="background:var(--b2)"></div>Grid</div>
+              <div class="cl-item"><div class="cl-dot" style="background:var(--a2)"></div>Solar</div>
+            </div>
+          </div>
+          <div class="cmp-bars" id="cmp-chart"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ct-dot" style="background:var(--g1)"></div>Comparison Table</div></div>
+          <div style="overflow:auto;max-height:230px">
+            <table class="tbl"><thead><tr><th>Units</th><th>Grid ₹</th><th>Solar ₹</th><th>Savings ₹</th><th>CO₂ kg</th></tr></thead><tbody id="cmp-tbl"></tbody></table>
+          </div>
+        </div>
+      </div>
+      <div class="g4 stagger" id="single-res" style="display:none">
+        <div class="mini"><div class="mini-l">Grid Cost</div><div class="mini-v" id="sc-grid" style="color:var(--b2)">—</div></div>
+        <div class="mini"><div class="mini-l">Solar Cost</div><div class="mini-v" id="sc-sol" style="color:var(--a2)">—</div></div>
+        <div class="mini"><div class="mini-l">You Save</div><div class="mini-v" id="sc-save" style="color:var(--g2)">—</div></div>
+        <div class="mini"><div class="mini-l">Recommendation</div><div class="mini-v" id="sc-rec" style="font-size:.78rem;color:var(--t1)">—</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ HISTORY ═══ -->
+    <div class="sec" id="sec-history">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.1rem;flex-wrap:wrap">
+        <div class="field" style="width:180px"><label>Time Window</label>
+          <select id="hhrs"><option value="6">Last 6 hours</option><option value="12">Last 12 hours</option><option value="24" selected>Last 24 hours</option><option value="48">Last 48 hours</option><option value="168">Last 7 days</option></select>
+        </div>
+        <button class="btn btn-pri" onclick="loadHistory()" style="align-self:flex-end">Load</button>
+        <div style="margin-left:auto;font-family:var(--f-mono);font-size:.7rem;color:var(--t3)" id="hist-cnt">— readings</div>
+      </div>
+      <div class="card stagger">
+        <div class="ch"><div class="ct"><div class="ct-dot" style="background:var(--v1)"></div>Energy Reading Log</div></div>
+        <div style="overflow-x:auto;max-height:480px;overflow-y:auto">
+          <table class="tbl">
+            <thead><tr><th>Time</th><th>Solar W</th><th>Load W</th><th>Grid W</th><th>Battery W</th><th>Eff%</th><th>Savings ₹</th><th>Weather</th><th>Tariff</th></tr></thead>
+            <tbody id="hist-tbl"></tbody>
+          </table>
+        </div>
+        <div id="hist-empty" style="text-align:center;padding:2.5rem;font-family:var(--f-mono);font-size:.75rem;color:var(--t3);display:none">No readings yet — visit Dashboard to generate data.</div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="sec" id="sec-settings">
+      <div class="card stagger">
+        <div class="ch">
+          <div class="ct"><div class="ct-dot" style="background:var(--a1)"></div>System Configuration</div>
+          <button class="btn btn-pri" onclick="saveSettings()">💾 Save Changes</button>
+        </div>
+        <div class="sgrid">
+          <div class="field"><label>Grid Price/kWh ₹</label><input type="number" id="sg" step="0.1" placeholder="8.50"><div class="field-note">Base import rate</div></div>
+          <div class="field"><label>Export Price/kWh ₹</label><input type="number" id="se" step="0.1" placeholder="3.50"><div class="field-note">Feed-in tariff</div></div>
+          <div class="field"><label>Solar O&M ₹/kWh</label><input type="number" id="sp" step="0.1" placeholder="1.50"><div class="field-note">Operation cost</div></div>
+          <div class="field"><label>CO₂ Factor kg/kWh</label><input type="number" id="sc2" step="0.01" placeholder="0.82"><div class="field-note">Grid emission factor</div></div>
+          <div class="field"><label>Solar Capacity kWp</label><input type="number" id="skw" step="0.5" placeholder="10.0"><div class="field-note">Installed panels</div></div>
+          <div class="field"><label>Battery kWh</label><input type="number" id="sbk" step="0.5" placeholder="13.5"><div class="field-note">Usable storage</div></div>
+          <div class="field"><label>Battery Efficiency</label><input type="number" id="sbe" step="0.01" min="0.1" max="1" placeholder="0.92"><div class="field-note">Round-trip 0–1</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TARIFFS ═══ -->
+    <div class="sec" id="sec-tariffs">
+      <div class="g2 stagger">
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ct-dot" style="background:var(--a1)"></div>Active Tariff Slots</div></div>
+          <div class="t-list" id="tariff-list"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ct-dot" style="background:var(--g1)"></div>Add New Slot</div></div>
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <div class="field"><label>Slot Name</label>
+              <select id="nt-nm"><option value="peak">Peak</option><option value="shoulder">Shoulder</option><option value="off-peak">Off-Peak</option></select></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem">
+              <div class="field"><label>Start Hr</label><input type="number" id="nt-s" min="0" max="23" value="18"></div>
+              <div class="field"><label>End Hr</label><input type="number" id="nt-e" min="0" max="23" value="22"></div>
+              <div class="field"><label>Multiplier</label><input type="number" id="nt-m" min="0.1" step="0.05" value="1.5"></div>
+            </div>
+            <button class="btn btn-pri" onclick="addTariff()">+ Add Slot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LOCATION ═══ -->
+    <div class="sec" id="sec-location">
+      <div class="card stagger">
+        <div class="ch">
+          <div class="ct"><div class="ct-dot" style="background:var(--b1)"></div>Location &amp; Timezone</div>
+          <div style="display:flex;gap:.6rem">
+            <button class="btn btn-blu" onclick="geoDetect()">📡 Auto GPS</button>
+            <button class="btn btn-pri" onclick="saveLoc()">💾 Save</button>
+          </div>
+        </div>
+        <div class="lgrid">
+          <div class="field"><label>City</label><input id="lc" placeholder="Pune"></div>
+          <div class="field"><label>Country</label><input id="lco" placeholder="India"></div>
+          <div class="field"><label>Latitude</label><input id="llat" type="number" step="0.0001" placeholder="18.5204"></div>
+          <div class="field"><label>Longitude</label><input id="llon" type="number" step="0.0001" placeholder="73.8567"></div>
+          <div class="field"><label>UTC Offset (hrs)</label><input id="ltz" type="number" step="0.5" placeholder="5.5"></div>
+        </div>
+        <div class="loc-status" id="loc-status"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BATTERY ═══ -->
+    <div class="sec" id="sec-battery">
+      <div class="g2 stagger">
+        <div class="card">
+          <div class="ch">
+            <div class="ct"><div class="ct-dot" style="background:var(--g1)"></div>Battery State</div>
+            <span class="pill" id="batt-pill" style="animation:none">—</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1rem">
+            <div class="mini"><div class="mini-l">SOC</div><div class="mini-v" id="batt-soc" style="color:var(--v2)">—%</div></div>
+            <div class="mini"><div class="mini-l">Stored</div><div class="mini-v" id="batt-kwh" style="color:var(--v2)">— kWh</div></div>
+          </div>
+          <div class="field"><label>Charge / Discharge (kWh)</label></div>
+          <div class="slider-row">
+            <input type="range" id="batt-slider" min="-10" max="10" step="0.5" value="0"
+              oninput="document.getElementById('batt-dv').textContent=parseFloat(this.value).toFixed(1)+' kWh'">
+            <div class="slider-val" id="batt-dv">0.0 kWh</div>
+          </div>
+          <button class="btn btn-grn" style="width:100%;margin-top:.75rem;justify-content:center" onclick="applyBatt()">⚡ Apply</button>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ct-dot" style="background:var(--b1)"></div>Next Hour Forecast</div></div>
+          <div style="text-align:center;padding:1.2rem 0">
+            <div style="font-family:var(--f-mono);font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Predicting</div>
+            <div style="font-family:var(--f-head);font-size:3.8rem;font-weight:800;color:var(--a2);line-height:1" id="nh-hr">—</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:1rem">
+              <div class="mini"><div class="mini-l">Solar</div><div class="mini-v" id="nh-sol" style="color:var(--a2)">— W</div></div>
+              <div class="mini"><div class="mini-l">Load</div><div class="mini-v" id="nh-load" style="color:var(--b2)">— W</div></div>
+              <div class="mini" style="grid-column:span 2"><div class="mini-l">Net Grid</div><div class="mini-v" id="nh-grid" style="color:var(--g2)">— W</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div><!-- /shell -->
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  ZYPHERA GRID  v3.0
+//
+//  ✅ FIXED: Dashboard response is FLAT (d.solar_w not d.power.solar_w)
+//  ✅ FIXED: Location loaded from GET /api/settings (not GET /api/location
+//            which does NOT exist in the backend)
+//  ✅ FIXED: All HTTP methods match backend exactly
+//  ✅ FIXED: PUT /api/battery/charge (not POST)
+//  ✅ FIXED: PUT /api/settings (not POST)
+//  ✅ ADDED: Animated particle canvas, count-up numbers, stagger anims
+// ════════════════════════════════════════════════════════════════
+
+// ✏️ Set your backend URL here
+const API = 'http://localhost:8000';
+
+let curHr = new Date().getHours();
+let chartData = [];
+
+/* ── Canvas Particle System ──────────────────────────────── */
+(function(){
+  const c = document.getElementById('zg-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let W, H, pts = [];
+  const resize = () => { W = c.width = innerWidth; H = c.height = innerHeight; };
+  resize(); addEventListener('resize', resize);
+
+  const COLS = [
+    [245,158,11],  // amber
+    [16,185,129],  // green
+    [59,130,246],  // blue
+    [139,92,246],  // violet
+  ];
+
+  function mk() {
+    const col = COLS[Math.floor(Math.random()*4)];
+    return {
+      x: Math.random()*W, y: H+20,
+      vx:(Math.random()-.5)*.35, vy:-(Math.random()*.4+.15),
+      r:Math.random()*1.4+.4,
+      col, a:0, maxA:Math.random()*.35+.08,
+      life:0, maxL:Math.random()*280+180,
+    };
+  }
+  for(let i=0;i<55;i++){ const p=mk(); p.y=Math.random()*H; p.life=Math.random()*p.maxL; pts.push(p); }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach((p,i)=>{
+      p.life++; p.x+=p.vx; p.y+=p.vy;
+      if(p.life<25) p.a=p.maxA*(p.life/25);
+      else if(p.life>p.maxL-25) p.a=p.maxA*((p.maxL-p.life)/25);
+      else p.a=p.maxA;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.col[0]},${p.col[1]},${p.col[2]},${p.a})`; ctx.fill();
+      if(p.life>=p.maxL) pts[i]=mk();
+    });
+    // Connection lines
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<75){ ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(22,31,48,${(1-d/75)*.35})`; ctx.lineWidth=.5; ctx.stroke(); }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── Helpers ─────────────────────────────────────────────── */
+const $  = id => document.getElementById(id);
+const st = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+
+/* Count-up animation */
+function numUp(el, to, suf='', dec=0) {
+  if (!el) return;
+  const from=parseFloat(el.dataset.v||'0')||0, dur=700, n=28;
+  let i=0; clearInterval(el._t);
+  el._t=setInterval(()=>{
+    i++; const ease=1-Math.pow(1-(i/n),3);
+    el.textContent=(from+(to-from)*ease).toFixed(dec)+suf;
+    if(i>=n){ el.textContent=to.toFixed(dec)+suf; el.dataset.v=to; clearInterval(el._t); }
+  },dur/n);
+  el.classList.add('updating'); setTimeout(()=>el.classList.remove('updating'),300);
+}
+
+/* Toast */
+function toast(msg, type='s') {
+  const e=$('toast'), icons={s:'✓',e:'✗',i:'ℹ'};
+  e.innerHTML=(icons[type]||'ℹ')+' '+msg;
+  e.className=`toast ${type} on`;
+  setTimeout(()=>e.classList.remove('on'),3500);
+}
+
+/* HTTP – matches backend exactly */
+async function req(path, opts={}) {
+  const r = await fetch(API+path,{headers:{'Content-Type':'application/json','Accept':'application/json'},...opts});
+  if(!r.ok){ const t=await r.text().catch(()=>''); throw new Error(`HTTP ${r.status}: ${t.slice(0,120)}`); }
+  return r.json();
+}
+const get  = p     => req(p);
+const post = (p,b) => req(p,{method:'POST', body:JSON.stringify(b)});
+const put  = (p,b) => req(p,{method:'PUT',  body:JSON.stringify(b)});
+const del  = p     => req(p,{method:'DELETE'});
+
+/* Connection indicator */
+function setOnline(ok) {
+  const c=$('tb-conn');
+  c.className='tb-conn '+(ok?'ok':'err');
+  st('tb-conn-txt',ok?'Connected':'Offline');
+  $('err-banner').classList.toggle('show',!ok);
+  $('err-url').textContent=API;
+}
+
+/* Pill helper */
+function pill(id, text, cls) {
+  const e=$(id); if(!e) return;
+  e.textContent=text.toUpperCase();
+  e.className=`pill ${cls}`;
+  e.style.animation='none';
+}
+function battColor(p){ return p>60?'var(--v2)':p>25?'var(--a2)':'var(--r2)'; }
+function setGauge(s){ const a=$('g-arc'); if(a) a.style.strokeDashoffset=(314-s/100*314).toFixed(2); }
+function fmtT(iso){ try{return new Date(iso).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}catch{return '—';} }
+
+/* Clock */
+setInterval(()=>{
+  const n=new Date();
+  st('tb-time',n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')+':'+n.getSeconds().toString().padStart(2,'0'));
+},1000);
+
+/* Navigation */
+const TITLES={
+  dashboard:['Dashboard','Overview · Real-time'],
+  forecast:['Forecast','24-Hour Prediction'],
+  compare:['Cost Compare','Grid vs Solar'],
+  history:['History','Energy Log'],
+  settings:['Settings','System Config'],
+  tariffs:['Tariffs','Pricing Slots'],
+  location:['Location','GPS & Timezone'],
+  battery:['Battery','State & Control'],
+};
+function showSec(id, el) {
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
+  $('sec-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  const [title,crumb]=TITLES[id]||[id,''];
+  st('tb-title',title); st('tb-crumb',crumb);
+  if(id==='forecast') loadForecast();
+  if(id==='compare')  loadCompare();
+  if(id==='history')  loadHistory();
+  if(id==='settings') loadSettings();
+  if(id==='tariffs')  loadTariffs();
+  if(id==='location') loadLocForm();
+  if(id==='battery')  loadBattPanel();
+}
+
+function qp(){
+  const h=$('ch').value.trim(), w=$('cw').value;
+  return`?weather=${w}`+(h?`&hour=${h}`:'');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   AREA CHART
+════════════════════════════════════════════════════════════════ */
+function initChart() {
+  const cv=$('chart-cv');
+  if (!cv) return;
+  cv.addEventListener('mousemove', onHover);
+  cv.addEventListener('mouseleave', ()=>$('chart-tt')?.classList.remove('vis'));
+  window.addEventListener('resize', ()=>{ if(chartData.length) drawChart(chartData); });
+}
+function drawChart(data) {
+  chartData=data;
+  const cv=$('chart-cv'); if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const dpr=devicePixelRatio||1;
+  const rect=cv.parentElement.getBoundingClientRect();
+  cv.width=rect.width*dpr; cv.height=rect.height*dpr;
+  cv.style.width=rect.width+'px'; cv.style.height=rect.height+'px';
+  ctx.scale(dpr,dpr);
+  const W=rect.width, H=rect.height;
+  const pad={l:2,r:12,t:12,b:22};
+  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+  ctx.clearRect(0,0,W,H);
+
+  const mx=Math.max(...data.map(d=>[d.solar_w||0,d.load_w||0]).flat(),1);
+  const steps=[0,.25,.5,.75,1];
+
+  // Y labels
+  const yl=$('chart-ylbl'); yl.innerHTML='';
+  [...steps].reverse().forEach(s=>{const d=document.createElement('div');d.textContent=Math.round(mx*s)+'W';yl.appendChild(d);});
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,.04)'; ctx.lineWidth=1;
+  steps.forEach(s=>{const y=pad.t+ph*(1-s); ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();});
+  ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+
+  function area(key, rgb, alpha) {
+    const pts=data.map((d,i)=>[pad.l+i/(data.length-1)*pw, pad.t+ph*(1-(d[key]||0)/mx)]);
+    const g=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);
+    g.addColorStop(0,`rgba(${rgb},${alpha})`); g.addColorStop(1,`rgba(${rgb},0)`);
+    ctx.beginPath(); ctx.moveTo(pts[0][0],pad.t+ph); ctx.lineTo(pts[0][0],pts[0][1]);
+    pts.forEach((p,i)=>{ if(!i)return; const prev=pts[i-1],cx=(prev[0]+p[0])/2; ctx.bezierCurveTo(cx,prev[1],cx,p[1],p[0],p[1]); });
+    ctx.lineTo(pts[pts.length-1][0],pad.t+ph); ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+    pts.forEach((p,i)=>{ if(!i)return; const prev=pts[i-1],cx=(prev[0]+p[0])/2; ctx.bezierCurveTo(cx,prev[1],cx,p[1],p[0],p[1]); });
+    ctx.strokeStyle=`rgba(${rgb},0.85)`; ctx.lineWidth=2; ctx.stroke();
+  }
+  area('load_w','59,130,246',.14);
+  area('solar_w','245,158,11',.18);
+
+  // NOW line
+  const nx=pad.l+curHr/23*pw;
+  ctx.strokeStyle='rgba(245,158,11,.35)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(nx,pad.t); ctx.lineTo(nx,pad.t+ph); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(245,158,11,.65)'; ctx.font='500 9px DM Mono,monospace';
+  ctx.fillText('NOW',nx+3,pad.t+10);
+
+  cv._pad=pad; cv._pw=pw; cv._ph=ph; cv._mx=mx;
+}
+function onHover(e) {
+  if (!chartData.length) return;
+  const cv=$('chart-cv'); const rect=cv.getBoundingClientRect();
+  const x=e.clientX-rect.left;
+  const pad=cv._pad||{l:2}, pw=cv._pw||(rect.width-14);
+  const i=Math.round((x-pad.l)/pw*(chartData.length-1));
+  if(i<0||i>=chartData.length) return;
+  const d=chartData[i];
+  const gw=(d.grid_w)!==undefined?d.grid_w:(d.load_w||0)-(d.solar_w||0);
+  st('tt-hr',`${i}:00`);
+  st('tt-sol',(d.solar_w||0).toFixed(0)+'W');
+  st('tt-load',(d.load_w||0).toFixed(0)+'W');
+  st('tt-grid',gw.toFixed(0)+'W');
+  const tt=$('chart-tt');
+  tt.style.left=Math.min(x+14,rect.width-145)+'px'; tt.style.top='12px';
+  tt.classList.add('vis');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DASHBOARD  —  GET /api/dashboard
+   NOTE: Response is FLAT — d.solar_w not d.power.solar_w
+════════════════════════════════════════════════════════════════ */
+async function loadDash() {
+  try {
+    const d = await get('/api/dashboard'+qp());
+    setOnline(true);
+    curHr = d.hour ?? new Date().getHours();
+
+    // KPI cards — d.solar_w, d.load_w, d.grid_w are FLAT keys
+    numUp($('k-sol'),  d.solar_w||0, '', 0);
+    st('k-sol-kw', ((d.solar_w||0)/1000).toFixed(2)+' kW');
+    pill('k-sol-p', d.solar_status||'none', 'pill-a');
+
+    numUp($('k-load'), d.load_w||0, '', 0);
+    st('k-load-kw', ((d.load_w||0)/1000).toFixed(2)+' kW');
+    pill('k-load-p', d.load_status||'—', 'pill-b');
+
+    numUp($('k-grid'), Math.abs(d.grid_w||0), '', 0);
+    st('k-grid-dir', (d.grid_w||0)<0 ? 'W  ↑ exporting' : 'W  ↓ importing');
+    const sn=d.tariff_slot||'off-peak';
+    pill('k-tariff-p', sn, sn==='peak'?'pill-r':sn==='shoulder'?'pill-a':'pill-g');
+    st('k-tariff-price', '₹'+(d.current_tariff_price||0).toFixed(3)+'/kWh');
+    st('fin-price', `${sn.toUpperCase()} · ₹${(d.current_tariff_price||0).toFixed(3)}/kWh`);
+
+    // Battery — d.battery_soc_percent, d.battery_charge_kwh are FLAT
+    numUp($('k-soc'), d.battery_soc_percent||0, '%', 1);
+    st('k-soc-kwh', (d.battery_charge_kwh||0).toFixed(2)+' kWh stored');
+    const sf=$('soc-fill');
+    sf.style.width=(d.battery_soc_percent||0)+'%';
+    sf.style.background=battColor(d.battery_soc_percent||0);
+
+    // Efficiency — d.efficiency_score, d.fill_factor are FLAT
+    st('g-eff',(d.efficiency_score||0).toFixed(1)+'%');
+    setGauge(d.efficiency_score||0);
+    $('ff-bar').style.width=((d.fill_factor||0)*100).toFixed(1)+'%';
+    st('ff-val',(d.fill_factor||0).toFixed(3));
+
+    // Financial — d.hourly_cost_inr, d.hourly_savings_inr, d.co2_saved_kg are FLAT
+    st('fin-cost','₹'+(d.hourly_cost_inr||0).toFixed(2));
+    st('fin-save','₹'+(d.hourly_savings_inr||0).toFixed(2));
+    st('fin-co2',(d.co2_saved_kg||0).toFixed(4)+' kg');
+
+    // Location — d.location.{city,country,timezone_offset_hrs}
+    if(d.location?.city){
+      const tz=d.location.timezone_offset_hrs||0;
+      document.querySelector('.sb-tagline').textContent=`📍 ${d.location.city}`;
+      st('tb-crumb',`${d.location.city}, ${d.location.country} · UTC${tz>=0?'+':''}${tz}`);
+    }
+
+    // Insight — d.insight.{message,action,priority,tips}
+    const ins=d.insight||{};
+    st('ins-msg',ins.message||'—');
+    st('ins-chip',(ins.action||'monitor').toUpperCase());
+    const pri=ins.priority||'low';
+    $('ins-chip').className=`pill ${pri==='high'?'pill-r':pri==='medium'?'pill-a':'pill-g'}`;
+    $('ins-chip').style.cssText='font-family:var(--f-mono);font-size:.6rem;padding:.17rem .55rem;border-radius:20px;border:1px solid;display:inline-flex;margin-bottom:.6rem';
+    $('ins-flag').className='ins-flag '+(pri==='high'?'ins-flag-r':pri==='medium'?'ins-flag-a':'ins-flag-g');
+    $('ins-tips').innerHTML=(ins.tips||[]).map(t=>`<li>${t}</li>`).join('')||'<li>System is operating normally.</li>';
+
+    // Area chart
+    await buildAreaChart();
+
+    // Tariff timeline
+    await buildTariff(curHr);
+
+  } catch(e) {
+    setOnline(false);
+    toast('Dashboard: '+e.message,'e');
+    console.error('Dashboard error:',e);
+  }
+}
+
+async function buildAreaChart() {
+  const w=$('cw').value;
+  try {
+    const rs=await Promise.all(Array.from({length:24},(_,i)=>i).map(h=>get(`/api/predict/${h}?weather=${w}`)));
+    drawChart(rs.map((r,h)=>({...r,hour:h})));
+  } catch(e){ console.warn('Chart:',e.message); }
+}
+
+async function buildTariff(now) {
+  try {
+    const slots=await get('/api/tariffs');
+    const bar=$('ttl-bar'); if(!bar) return;
+    if(!slots?.length){bar.innerHTML='';return;}
+    bar.innerHTML=slots.map(s=>{
+      const span=s.hour_end-s.hour_start+1;
+      const cls=s.slot_name==='peak'?'ts-pk':s.slot_name==='shoulder'?'ts-sh':'ts-op';
+      const isN=now>=s.hour_start&&now<=s.hour_end;
+      if(isN){
+        const tn=$('tariff-now'); if(tn){tn.textContent=s.slot_name.toUpperCase();tn.className=`pill ${s.slot_name==='peak'?'pill-r':s.slot_name==='shoulder'?'pill-a':'pill-g'}`;tn.style.animation='none';}
+      }
+      return`<div class="ts ${cls} ${isN?'now':''}" style="flex:${span}"
+               title="${s.slot_name} ${s.hour_start}:00–${s.hour_end}:59 ×${s.price_multiplier}">
+               ${span>2?s.slot_name:''}
+             </div>`;
+    }).join('');
+  } catch(e){console.warn('Tariff:',e.message);}
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FORECAST  —  GET /api/predict/{hour}
+════════════════════════════════════════════════════════════════ */
+async function loadForecast() {
+  const w=$('fc-weather')?.value||$('cw').value;
+  try {
+    const rs=await Promise.all(Array.from({length:24},(_,i)=>i).map(h=>get(`/api/predict/${h}?weather=${w}`)));
+    const mx=Math.max(...rs.map(r=>Math.max(r.solar_w||0,r.load_w||0)),1);
+    const fc=$('fc-chart');
+    if(fc) fc.innerHTML=rs.map((r,h)=>`
+      <div class="bc ${h===curHr?'cur':''}">
+        <div class="bg2">
+          <div class="bar sb" style="height:${((r.solar_w||0)/mx*100).toFixed(1)}%" title="H${h}: Solar ${r.solar_w}W"></div>
+          <div class="bar lb" style="height:${((r.load_w||0)/mx*100).toFixed(1)}%" title="H${h}: Load ${r.load_w}W"></div>
+        </div>
+        <div class="blbl">${h%6===0?h:''}</div>
+      </div>`).join('');
+    const tb=$('fc-tbl');
+    if(tb) tb.innerHTML=rs.map((r,h)=>`<tr>
+      <td style="font-family:var(--f-mono);color:${h===curHr?'var(--a2)':'var(--t2)'}">${h}:00${h===curHr?' ◀':''}</td>
+      <td class="tv-sol">${(r.solar_w||0).toFixed(0)}</td>
+      <td class="tv-load">${(r.load_w||0).toFixed(0)}</td>
+      <td><span class="pill ${r.tariff_slot==='peak'?'pill-r':r.tariff_slot==='shoulder'?'pill-a':'pill-g'}" style="font-size:.58rem;animation:none">${r.tariff_slot||'—'}</span></td>
+    </tr>`).join('');
+    const solV=rs.map((r,i)=>({v:r.solar_w||0,i}));
+    const pk=solV.reduce((a,b)=>b.v>a.v?b:a,{v:0,i:0});
+    const lk=rs.map((r,i)=>({v:r.load_w||0,i})).reduce((a,b)=>b.v>a.v?b:a,{v:0,i:0});
+    st('fc-pkhr',pk.i+':00'); st('fc-pkw',pk.v.toFixed(0)+' W');
+    st('fc-lhr',lk.i+':00'); st('fc-avg',(rs.reduce((s,r)=>s+(r.solar_w||0),0)/24).toFixed(0)+' W');
+  } catch(e){ toast('Forecast: '+e.message,'e'); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   COMPARE  —  GET /api/compare-energy-range  +  /api/compare-energy
+════════════════════════════════════════════════════════════════ */
+async function loadCompare() {
+  const mx=parseInt($('cmx').value)||50, stp=parseInt($('cst').value)||5;
+  try {
+    const d=await get(`/api/compare-energy-range?max_units=${mx}&step=${stp}`);
+    const data=d.data??[], mc=Math.max(...data.map(r=>r.grid_cost),1);
+    const cc=$('cmp-chart');
+    if(cc) cc.innerHTML=data.map(r=>`
+      <div class="cg2"><div class="cp2">
+        <div class="cb2 gb" style="height:${(r.grid_cost/mc*156).toFixed(1)}px" title="Grid ₹${r.grid_cost}"></div>
+        <div class="cb2 sb" style="height:${(r.solar_cost/mc*156).toFixed(1)}px" title="Solar ₹${r.solar_cost}"></div>
+      </div><div class="cg-lbl">${r.units}</div></div>`).join('');
+    const ct=$('cmp-tbl');
+    if(ct) ct.innerHTML=data.map(r=>`<tr>
+      <td style="font-family:var(--f-mono)">${r.units}</td>
+      <td class="tv-imp">₹${r.grid_cost}</td>
+      <td class="tv-sol">₹${r.solar_cost}</td>
+      <td class="tv-exp">₹${r.savings}</td>
+      <td style="color:var(--t2)">${r.co2_saved_kg??'—'}</td>
+    </tr>`).join('');
+  } catch(e){ toast('Compare: '+e.message,'e'); }
+}
+async function loadSingle() {
+  const units=parseFloat($('su').value)||10;
+  try {
+    const d=await get(`/api/compare-energy?units=${units}`);
+    $('single-res').style.display='grid';
+    st('sc-grid','₹'+d.grid_cost); st('sc-sol','₹'+d.solar_cost);
+    st('sc-save','₹'+d.savings); st('sc-rec',d.recommendation||'—');
+  } catch(e){ toast(e.message,'e'); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HISTORY  —  GET /api/readings
+════════════════════════════════════════════════════════════════ */
+async function loadHistory() {
+  const hrs=$('hhrs').value;
+  try {
+    const d=await get(`/api/readings?hours=${hrs}`);
+    const rows=d.readings??[];
+    st('hist-cnt',rows.length+' readings'); st('hist-badge',rows.length);
+    $('hist-empty').style.display=rows.length===0?'block':'none';
+    $('hist-tbl').innerHTML=rows.map(r=>{
+      const gw=r.grid_w??0;
+      return`<tr>
+        <td style="font-family:var(--f-mono);color:var(--t3)">${fmtT(r.timestamp||r.ts)}</td>
+        <td class="tv-sol">${(r.solar_w??0).toFixed(0)}</td>
+        <td class="tv-load">${(r.load_w??0).toFixed(0)}</td>
+        <td class="${gw>0?'tv-imp':'tv-exp'}">${gw.toFixed(0)}</td>
+        <td style="color:${r.battery_w>0?'var(--g2)':r.battery_w<0?'var(--r2)':'var(--t3)'}">${(r.battery_w??0).toFixed(0)}</td>
+        <td class="tv-eff">${(r.efficiency_score??0).toFixed(1)}%</td>
+        <td style="color:var(--g2)">₹${(r.savings_inr??0).toFixed(2)}</td>
+        <td style="color:var(--t2);font-size:.72rem">${r.weather_condition??'—'}</td>
+        <td><span class="pill ${r.tariff_slot==='peak'?'pill-r':r.tariff_slot==='shoulder'?'pill-a':'pill-g'}" style="font-size:.58rem;animation:none">${r.tariff_slot??'—'}</span></td>
+      </tr>`;
+    }).join('');
+  } catch(e){ toast('History: '+e.message,'e'); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SETTINGS  —  GET /api/settings  +  PUT /api/settings
+════════════════════════════════════════════════════════════════ */
+async function loadSettings() {
+  try {
+    const s=await get('/api/settings');
+    const sv=(id,k)=>{const e=$(id);if(e&&s[k]!=null)e.value=s[k];};
+    sv('sg','grid_price_per_kwh'); sv('se','export_price_per_kwh');
+    sv('sp','solar_price_per_kwh'); sv('sc2','co2_factor');
+    // Note: backend uses max_solar_capacity_kw not solar_capacity_kw
+    const skw=$('skw'); if(skw&&s.max_solar_capacity_kw!=null) skw.value=s.max_solar_capacity_kw;
+    sv('sbk','battery_capacity_kwh'); sv('sbe','battery_efficiency');
+  } catch(e){ toast('Load settings: '+e.message,'e'); }
+}
+async function saveSettings() {
+  const body={
+    grid_price_per_kwh:   parseFloat($('sg').value)||undefined,
+    export_price_per_kwh: parseFloat($('se').value)||undefined,
+    co2_factor:           parseFloat($('sc2').value)||undefined,
+    max_solar_capacity_kw:parseFloat($('skw').value)||undefined,  // ← correct field name
+    battery_capacity_kwh: parseFloat($('sbk').value)||undefined,
+    battery_efficiency:   parseFloat($('sbe').value)||undefined,
+    updated_by:           'zyphera-ui',
+  };
+  Object.keys(body).forEach(k=>{if(!body[k])delete body[k];});
+  try { await put('/api/settings',body); toast('Settings saved'); }
+  catch(e){ toast('Save error: '+e.message,'e'); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TARIFFS  —  GET/POST /api/tariffs  +  DELETE /api/tariffs/{id}
+════════════════════════════════════════════════════════════════ */
+async function loadTariffs() {
+  try {
+    const slots=await get('/api/tariffs'), list=$('tariff-list');
+    if(!slots?.length){list.innerHTML='<div style="font-family:var(--f-mono);font-size:.72rem;color:var(--t3);padding:.4rem">No active slots.</div>';return;}
+    list.innerHTML=slots.map(s=>{
+      const cls=s.slot_name==='peak'?'t-pk':s.slot_name==='shoulder'?'t-sh':'t-op';
+      return`<div class="t-row">
+        <div class="t-name ${cls}">${s.slot_name}</div>
+        <div class="t-hrs">${s.hour_start}:00 – ${s.hour_end}:59</div>
+        <div class="t-mult">×${s.price_multiplier}</div>
+        <button class="t-del" onclick="delTariff(${s.id})">✕ Remove</button>
+      </div>`;
+    }).join('');
+  } catch(e){ console.warn('Tariffs:',e.message); }
+}
+async function addTariff(){
+  const body={slot_name:$('nt-nm').value,hour_start:parseInt($('nt-s').value),
+    hour_end:parseInt($('nt-e').value),price_multiplier:parseFloat($('nt-m').value),system_id:'default'};
+  if(body.hour_start>body.hour_end){toast('Start ≤ end hour','e');return;}
+  try{await post('/api/tariffs',body);toast('Slot added');loadTariffs();}
+  catch(e){toast('Add tariff: '+e.message,'e');}
+}
+async function delTariff(id){
+  try{await del(`/api/tariffs/${id}`);toast('Slot removed');loadTariffs();}
+  catch(e){toast('Delete: '+e.message,'e');}
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LOCATION
+   ✅ FIXED: Load from GET /api/settings (NOT GET /api/location)
+             The backend has NO GET /api/location endpoint.
+             Location is stored in system_settings table.
+             Use POST /api/location to SAVE.
+════════════════════════════════════════════════════════════════ */
+async function loadLocForm() {
+  try {
+    // ✅ CORRECT: location fields are in GET /api/settings
+    const s = await get('/api/settings');
+    if(s.city)                      $('lc').value  = s.city;
+    if(s.country)                   $('lco').value = s.country;
+    if(s.latitude)                  $('llat').value= s.latitude;
+    if(s.longitude)                 $('llon').value= s.longitude;
+    if(s.timezone_offset_hrs!=null) $('ltz').value = s.timezone_offset_hrs;
+    if(s.city) st('loc-status','✅ Location loaded: '+s.city+', '+s.country);
+  } catch(e){ console.warn('Load location:',e.message); }
+}
+async function saveLoc() {
+  const body={
+    city:               $('lc').value.trim(),
+    country:            $('lco').value.trim(),
+    latitude:           parseFloat($('llat').value)||0,
+    longitude:          parseFloat($('llon').value)||0,
+    timezone_offset_hrs:parseFloat($('ltz').value)||5.5,
+    system_id:          'default',
+  };
+  try {
+    // ✅ CORRECT: POST /api/location to save
+    const res=await post('/api/location',body);
+    st('loc-status',`✅ Saved — ${res.city}, ${res.country}`);
+    document.querySelector('.sb-tagline').textContent=`📍 ${res.city}`;
+    toast('Location saved');
+  } catch(e){ st('loc-status','❌ '+e.message); toast(e.message,'e'); }
+}
+async function geoDetect() {
+  if(!navigator.geolocation){st('loc-status','❌ Geolocation not supported');return;}
+  st('loc-status','⏳ Detecting your location…');
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude.toFixed(6), lon=pos.coords.longitude.toFixed(6);
+    $('llat').value=lat; $('llon').value=lon;
+    $('ltz').value=(-(new Date().getTimezoneOffset())/60).toFixed(1);
+    try {
+      const g=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+      const j=await g.json();
+      const city=j.address?.city||j.address?.town||j.address?.village||'';
+      const country=j.address?.country||'';
+      $('lc').value=city; $('lco').value=country;
+      st('loc-status',`✅ Detected — ${city}, ${country} (lat ${lat})`);
+      toast('Location detected: '+city);
+    } catch {
+      st('loc-status',`✅ Coordinates set (${lat}, ${lon}) — enter city manually`);
+    }
+  }, err=>st('loc-status','❌ '+err.message+' — please allow location access'));
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BATTERY  —  GET /api/battery  +  PUT /api/battery/charge
+════════════════════════════════════════════════════════════════ */
+async function loadBattPanel(){
+  try{
+    const b=await get('/api/battery'), soc=b.soc_percent??0;
+    st('batt-soc',soc.toFixed(1)+'%');
+    st('batt-kwh',(b.charge_kwh??0).toFixed(2)+' kWh');
+    const p=$('batt-pill');
+    if(p){p.textContent=soc>60?'CHARGED':soc>25?'PARTIAL':'LOW';
+      p.className=`pill ${soc>60?'pill-g':soc>25?'pill-a':'pill-r'}`;p.style.animation='none';}
+    // Next hour
+    const w=$('cw')?.value||'clear', nh=(curHr+1)%24;
+    const d=await get(`/api/predict/${nh}?weather=${w}`);
+    st('nh-hr',nh+':00');
+    st('nh-sol',(d.solar_w??0).toFixed(0)+' W');
+    st('nh-load',(d.load_w??0).toFixed(0)+' W');
+    const gw=d.grid_w??((d.load_w||0)-(d.solar_w||0));
+    st('nh-grid',(gw>=0?'+':'')+gw.toFixed(0)+' W');
+  } catch(e){ console.warn('Battery panel:',e.message); }
+}
+async function applyBatt(){
+  const delta=parseFloat($('batt-slider').value);
+  if(delta===0){toast('Adjust slider first','i');return;}
+  try{
+    // ✅ CORRECT: PUT /api/battery/charge
+    await put('/api/battery/charge',{delta_kwh:delta});
+    toast(`Battery ${delta>0?'charged':'discharged'} ${Math.abs(delta).toFixed(1)} kWh`);
+    $('batt-slider').value=0; st('batt-dv','0.0 kWh'); loadBattPanel();
+  } catch(e){ toast('Battery: '+e.message,'e'); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BOOT
+   Load location from /api/settings on startup, then load dashboard
+════════════════════════════════════════════════════════════════ */
+initChart();
+(async()=>{
+  try {
+    // ✅ CORRECT: Get location from /api/settings (the only source of truth)
+    const s = await get('/api/settings');
+    if(s.city) {
+      document.querySelector('.sb-tagline').textContent=`📍 ${s.city}`;
+      st('tb-crumb',`${s.city}, ${s.country}`);
+    }
+  } catch(e){ console.info('Settings pre-load skipped:', e.message); }
+
+  await loadDash();
+})();
+
+// Auto-refresh every 60s on dashboard
+setInterval(()=>{
+  if(document.querySelector('.sec.active')?.id==='sec-dashboard') loadDash();
+},60000);
+</script>
+</body>
+</html>
